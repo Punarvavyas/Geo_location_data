@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script>
+
+function myfunction(){
+$(document).ready(function(){
+  
+    $.post("http://127.0.0.1:5000/dbcall","",
+    function(data,status){
+      
+      var d = JSON.parse(data);
+     // console.log(data)
+	  //console.log(d)
+      var geodata  = document.getElementById("geodata");
+
+ for (var i = 0; i < d.length; i++) {
+                var option = document.createElement("OPTION");
+
+
+                option.innerHTML = d[i];
+
+
+                option.value = d[i];
+
+
+                geodata.options.add(option);
+            }
+    });
+  });
+  
+  
+  
+  
+
+}
+function radd(){
+
+$(document).ready(function(){
+var ele= document.getElementsByName('db');
+
+
+for(i = 0; i < ele.length; i++) {
+if(ele[i].checked) {
+if(ele[i].value=="sql"){getval();}
+else{getvalmo();}
+
+
+}
+}
+
+
+});
+
+}
+
+function getval(){
+
+var temp = document.getElementById("geodata");
+		var strUser = temp.options[temp.selectedIndex].text;
+		console.log(strUser)
+
+var sendDate = (new Date()).getTime();
+
+$(document).ready(function(){
+	$.post("http://127.0.0.1:5000/sqldbcall",{struser:strUser},
+	function(data,status){
+		//alert(data);
+		//console.log(data)
+		var m=JSON.parse(data);
+		console.log(m)
+		 var receiveDate = (new Date()).getTime();
+		 var responseTimeMs = receiveDate - sendDate;
+		 console.log(responseTimeMs)
+		// alert(responseTimeMs);
+		 var txt="";
+		 txt += "<table border='1'>"
+    for (x in m) {
+      txt += "<tr><td>" +m[x] + "</td></tr>";
+    }
+    txt += "</table>"
+	 document.getElementById("demo").innerHTML = txt;
+		
+	});
+});
+
+}	
+	
+
+function getvalmo(){
+
+var temp = document.getElementById("geodata");
+		var strUser = temp.options[temp.selectedIndex].text;
+		console.log(strUser)
+
+var sendDate = (new Date()).getTime();
+
+$(document).ready(function(){
+	$.post("http://127.0.0.1:5000/mongodbcall",{str1user:strUser},
+	function(data,status){
+		//alert(data);
+		//console.log(data)
+		var data1=JSON.stringify(data)
+		//console.log(data1)
+		var m=JSON.parse(data);
+		//console.log(m)
+		 var receiveDate = (new Date()).getTime();
+		 var responseTimeMs = receiveDate - sendDate;
+		// console.log(responseTimeMs)
+		// alert(responseTimeMs);
+		 var txt="";
+		 txt += "<table border='1'>"
+    for (var j=0;j<m.length;j++) {
+	txt+= "<tr>"
+	var flag=true
+	
+	for (var key in m[j]) {
+	
+	
+	if(flag==true){
+	//console.log(m[j][key]["$oid"])
+	txt += "<td>  oid -> " + m[j][key]["$oid"] + "</td>";
+	flag = false
+	continue
+
+	}
+	
+	
+	
+	
+	
+    if (m[j].hasOwnProperty(key)) {
+        //console.log(key + " -> " + m[j][key]);
+		txt += "<td>" +key + " -> " + m[j][key] + "</td>";
+    }
+	}
+	
+	
+	
+	txt+="</tr>"
+	
+	
+	
+	
+      
+    }
+    txt += "</table>"
+	 document.getElementById("demo").innerHTML = txt;
+		
+	});
+});
+
+}	
+	
+
+
+
+</script>
+</head>
+<body onload="myfunction()">
+
+
+<input type="radio" id="1" value="sql" name="db">Mysql</input>
+<input type="radio" id="2" value="mongodb" name="db" checked>mongodb</input>
+<select id="geodata">
+
+</select>
+
+<button onclick="radd()">submit</button>
+
+<p id="demo"></p>
+
+</body>
+</html>
